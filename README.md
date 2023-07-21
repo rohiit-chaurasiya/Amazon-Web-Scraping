@@ -25,4 +25,6 @@ cd Automation-Test
 
 ### Usage:
   - Run the amazonDATA.py script:
-  - python amazonDATA.py
+    ```
+    python amazonDATA.py
+    ```
