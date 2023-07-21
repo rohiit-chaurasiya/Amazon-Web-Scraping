@@ -25,17 +25,27 @@ class AmazonProductScraper:
         print(">> Category URL: ", category_url)
         return category_url
 
+    def truncate_title(title, max_words=15):
+        words = title.split()[:max_words]
+        return ' '.join(words)
+
     @staticmethod
     def extract_product_information(page_results):
         temp_record = []
         for item in page_results:
             description = item.h2.a.text.strip()
-            category_url = "https://www.amazon.in/" + item.h2.a.get('href')
 
             try:
                 product_price = item.find('span', 'a-offscreen').text
             except AttributeError:
                 product_price = "N/A"
+
+            try:
+                product_title = item.h2.a.text.strip().replace(',', '')
+                title=product_title.split()[:5]
+                name=' '.join(title)
+            except AttributeError:
+                product_title = "N/A"
 
             try:
                 product_review = item.i.text.strip()
@@ -47,7 +57,7 @@ class AmazonProductScraper:
             except AttributeError:
                 review_number = "N/A"
 
-            product_information = (description, product_price[1:], product_review, review_number, category_url)
+            product_information = (name,product_price[1:],product_review,review_number, description )
             temp_record.append(product_information)
 
         return temp_record
@@ -81,7 +91,7 @@ class AmazonProductScraper:
 
         with open(file_name, "w", newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow(['Description', 'Price', 'Rating', 'Review Count', 'Product URL'])
+            writer.writerow(['Title', 'Price', 'Rating', 'Review Count', 'Description'])
             writer.writerows(records)
 
         message = f">> Information about the product '{self.category_name}' is stored in {file_name}\n"
